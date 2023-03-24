@@ -37,11 +37,11 @@
                     {{film.description}}
                 </p>
                 {% if prikazi_dugme %}
-                <a href="{{ url_for('dodaj_u_bazu', rbb=film.imdb_id) }}" class="button">Add</a>
+                <a href="{{ url_for('dodaj_u_bazu', film_id_za_dodati=film.imdb_id) }}" class="button">Add</a>
 
                 {% else %}
-                <a href="{{ url_for('pretrazi_i_prikazi_filmove', naslov=True) }}" class="button">Update</a>
-                <a href="{{ url_for('pretrazi_i_prikazi_filmove', rb=film.id) }}" class="button delete-button">Delete</a>
+                <a href="{{ url_for('edit', naslov=film.id) }}" class="button">Update</a>
+                <a href="{{ url_for('obrisi_film', rb=film.id) }}" class="button delete-button">Delete</a>
                 {% endif %}
 
 

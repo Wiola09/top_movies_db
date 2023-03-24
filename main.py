@@ -43,7 +43,7 @@ class RateMovieForm(FlaskForm):
 
 class AddMovie(FlaskForm):
     title = StringField(label='Movie Title', validators=[Length(min=8)])
-    submit = SubmitField(label="Add Movie")
+    submit = SubmitField(label="Search By Name")
 
 
 recnik = {'adult': False,
@@ -77,6 +77,7 @@ def pretrazi_i_prikazi_filmove():
     da_je_stranica_sa_rezultatima_pretrage = request.args.get('kliknuta_pretraga')
     print(da_je_stranica_sa_rezultatima_pretrage, "ovo")
     print(type(bool(da_je_stranica_sa_rezultatima_pretrage)))
+    # ovde mislim da moze i if form.validate_on_submit():, mozda samo treba pre definisati formu addmovie_form = AddMovie()
     if request.method == "POST":
         film = request.form["title"]
         tmdb = TMDB_API()
@@ -105,9 +106,18 @@ def pretrazi_i_prikazi_filmove():
     addmovie_form = AddMovie()
     return render_template("add.html", form=addmovie_form)
 
+@app.route("/delete", methods=["GET", "POST"])
+def obrisi_film():
+    movie_id = request.args.get('rb')
+    movie_to_delete = Movie.query.get(movie_id)
+    db.session.delete(movie_to_delete)
+    db.session.commit()
+    # Umesto return redirect(url_for('home')), sa url_for biramo funkciju
+    return redirect('/')
+
 @app.route("/dodaj_u_bazu")
 def dodaj_u_bazu():
-    film_id = request.args.get('rbb')
+    film_id = request.args.get('film_id_za_dodati')
     tmdb = TMDB_API()
     film = tmdb.uzmi_film_API(film_id)
     new_movie = Movie(
@@ -122,28 +132,45 @@ def dodaj_u_bazu():
     )
     db.session.add(new_movie)
     db.session.commit()
-    print(film)
-    print(film["original_title"])
-    # print(film_id)
-    # print(type(film_id))
-    # print("samo test")
+
     return redirect("/")
+
+@app.route("/edit", methods=["GET", "POST"])
+def edit():
+    # Argumen se daje uz pozivanje funkcije u idex.html href="{{ url_for('edit', naslov=film.id) }}"
+    movie_id = request.args.get('naslov')
+
+    movie_to_update = Movie.query.filter_by(id=movie_id).first()
+    # ovde mislim da moze i if edit_review_and_rating_form.validate_on_submit():,
+    # mozda samo treba pre definisati formu edit_review_and_rating_form = RateMovieForm())
+
+    if request.method == "POST":
+        movie_to_update.review = request.form["review"]
+        movie_to_update.rating = request.form["rating"]
+        db.session.commit()
+        return redirect(url_for('home'))
+
+    edit_review_and_rating_form = RateMovieForm()
+
+    # ovaj id mi sluzi da prenesem objekat filma <h1 class="heading">{{ id.title }}</h1>
+    return render_template("edit.html", form=edit_review_and_rating_form, id=movie_to_update)
+
+
 
 @app.route("/")
 def home():
-    tmdb = TMDB_API()
-    results = tmdb.uzmi_API("Kosovo")
+    # tmdb = TMDB_API()
 
     try:
         Movie.add_movie()
     except:
         print("vec dodat")
 
-    all_books = Movie.query.order_by(Movie.rating).all()
+    svi_filmovi_sortirani = Movie.query.order_by(Movie.rating).all()
     # print(all_books)
     dodaj_novi = False
 
-    return render_template("index.html", filmovi=all_books)
+    return render_template("index.html", filmovi=svi_filmovi_sortirani)
 
 
 if __name__ == '__main__':
