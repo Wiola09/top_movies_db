@@ -118,6 +118,8 @@ def obrisi_film():
 @app.route("/dodaj_u_bazu")
 def dodaj_u_bazu():
     film_id = request.args.get('film_id_za_dodati')
+    film_rating = request.args.get('film_rating')
+    film_review = request.args.get('film_review')
     tmdb = TMDB_API()
     film = tmdb.uzmi_film_API(film_id)
     new_movie = Movie(
@@ -125,9 +127,9 @@ def dodaj_u_bazu():
         title=film["original_title"],
         year=film["release_date"],
         description=film["overview"],
-        rating="7.3",
+        rating=film_rating,
         ranking="10",
-        review="My favourite character was the caller.",
+        review=film_review,
         img_url=f"https://image.tmdb.org/t/p/w500{film['poster_path']}"
     )
     db.session.add(new_movie)
@@ -139,17 +141,33 @@ def dodaj_u_bazu():
 def edit():
     # Argumen se daje uz pozivanje funkcije u idex.html href="{{ url_for('edit', naslov=film.id) }}"
     movie_id = request.args.get('naslov')
+    print(movie_id)
+    film_test = request.args.get("film_id_za_dodati")
+    print(film_test)
 
     movie_to_update = Movie.query.filter_by(id=movie_id).first()
+    print(movie_to_update)
     # ovde mislim da moze i if edit_review_and_rating_form.validate_on_submit():,
     # mozda samo treba pre definisati formu edit_review_and_rating_form = RateMovieForm())
 
     if request.method == "POST":
-        movie_to_update.review = request.form["review"]
-        movie_to_update.rating = request.form["rating"]
-        db.session.commit()
-        return redirect(url_for('home'))
-
+        film_review_forma = request.form["review"]
+        film_rating_forma = request.form["rating"]
+        try:
+            # Prvo probava pretragu baze, ovo hvata posle pritiska "update" dugmeta, editovanje psotojeceg filma
+            movie_to_update.review = film_review_forma
+            movie_to_update.rating = film_rating_forma
+            db.session.commit()
+            return redirect(url_for('home'))
+        # Posto kada je nepostojeci film u nasoj DB javlja AttributeError to sam iskoristio
+        # (mada nisam morao da specificiram gresku) i preusmerio nafunkciju za dodavanje
+        # filma gde sam poslao potrebne argumente
+        except AttributeError:
+            return redirect(url_for("dodaj_u_bazu",
+                                    film_id_za_dodati=film_test,
+                                    film_rating=film_rating_forma,
+                                    film_review=film_review_forma
+                                    ))
     edit_review_and_rating_form = RateMovieForm()
 
     # ovaj id mi sluzi da prenesem objekat filma <h1 class="heading">{{ id.title }}</h1>
@@ -159,17 +177,20 @@ def edit():
 
 @app.route("/")
 def home():
-    # tmdb = TMDB_API()
-
     try:
         Movie.add_movie()
     except:
         print("vec dodat")
 
+    # Deo koda zaduzen za sortiranje filmova od manjeg ka vecem, pa se onda obrne,
     svi_filmovi_sortirani = Movie.query.order_by(Movie.rating).all()
+    svi_filmovi_sortirani.reverse()
+    for i in range(len(svi_filmovi_sortirani)):
+        # This line gives each movie a new ranking reversed from their order in all_movies
+        svi_filmovi_sortirani[i].ranking = i + 1
     # print(all_books)
     dodaj_novi = False
-
+    db.session.commit()
     return render_template("index.html", filmovi=svi_filmovi_sortirani)
 
 
