@@ -15,9 +15,12 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="heading">My Top 10 Movies</h1>
+    <h1 class="heading ">My Top 10 Movies</h1>
     <p class="description">These are my all time favourite movies.</p>
+
     {% for film in filmovi %}
+
+
     <div class="card">
         <div class="front" style="background-image: url({{film.img_url}});">
             <p class="large">{{film.ranking}}</p>
@@ -33,10 +36,22 @@
                 <p class="overview">
                     {{film.description}}
                 </p>
+                {% if prikazi_dugme %}
+                <a href="{{ url_for('dodaj_u_bazu', rbb=film.imdb_id) }}" class="button">Add</a>
+
+                {% else %}
+                <a href="{{ url_for('pretrazi_i_prikazi_filmove', naslov=True) }}" class="button">Update</a>
+                <a href="{{ url_for('pretrazi_i_prikazi_filmove', rb=film.id) }}" class="button delete-button">Delete</a>
+                {% endif %}
+
 
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
+<div class=" container text-center add">
+    <a href="{{ url_for('pretrazi_i_prikazi_filmove', kliknuta_pretraga=True)}}" class="button">Search Movie DB and Add Movie</a>
+</div>
+
 {% endblock %}

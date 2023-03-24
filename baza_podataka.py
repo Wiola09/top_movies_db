@@ -13,6 +13,7 @@ db = SQLAlchemy()
 
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    imdb_id = db.Column(db.String(250), unique=True, nullable=True)
     title = db.Column(db.String(250), unique=True, nullable=True)
     year = db.Column(db.String(250), nullable=True)
     description = db.Column(db.String(250), nullable=True)
@@ -29,6 +30,7 @@ class Movie(db.Model):
     def add_movie(self):
         new_movie = Movie(
             id=2,
+            imdb_id="55",
             title="Phone Boothaa",
             year="2002",
             description="Publicist Stuart Shepard finds himself trapped in a phone booth, pinned down by an extortionist's sniper rifle. Unable to leave or receive outside help, Stuart's negotiation with the caller leads to a jaw-dropping climax.",

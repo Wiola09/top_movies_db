@@ -28,10 +28,7 @@
 	 bottom: 0;
 }
 
-.container.add {
-    margin-top: 40px;
-    margin-bottom: 20px;
-}
+
 
  .description {
 	 width: 100%;
@@ -153,4 +150,32 @@
 	 align-items: center;
 	 flex-wrap: wrap;
 	 max-width: 1500px;
+}
+/* Deo vezan za dugme add na kraju index.html*/
+.container.add {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+ .button {
+	 transform: translateZ(40px);
+	 cursor: pointer;
+	 -webkit-backface-visibility: hidden;
+	 backface-visibility: hidden;
+	 font-weight: bold;
+	 color: #fff;
+	 padding: 0.5em 1em;
+	 border-radius: 100px;
+	 font: inherit;
+	 background: linear-gradient(135deg, #1a9be6, #1a57e6);
+	 border: none;
+	 position: relative;
+	 transform-style: preserve-3d;
+	 transition: 300ms ease;
+}
+
+/* Delete dugme pre svega za crvenu boju*/
+.button.delete-button {
+	 background-color: rgba(230, 87, 230, 0.25);
+	 background: linear-gradient(135deg, #e61a46, #e61a1a);
 }
