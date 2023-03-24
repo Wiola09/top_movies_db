@@ -2,8 +2,8 @@ import os
 
 import requests
 import json
-# # TMDB_API_KEY = os.environ["TMDB_API_KEY"]
-TMDB_API_KEY = "a22cd7b4671d671266a781dda68ae30e"
+TMDB_API_KEY = os.environ["TMDB_API_KEY"]
+
 
 class TMDB_API:
     def __init__(self):
@@ -29,14 +29,12 @@ class TMDB_API:
         ID = int(filmid)
         url = f"https://api.themoviedb.org/3/movie/{ID}?"
 
-        payload = {}
-        headers = {}
         parameters = {
-            "api_key": "a22cd7b4671d671266a781dda68ae30e",
+            "api_key": TMDB_API_KEY,
             "language": "en-US",
         }
 
-        response = requests.request("GET", url, headers=headers, data=payload, params=parameters)
+        response = requests.request("GET", url, headers=self.headers, data=self.payload, params=parameters)
         # print(response.text)
         json_data_film = json.loads(response.text)
         # print(json_data_film)
