@@ -1,0 +1,28 @@
+/* Ovaj deo omogucava iluziju okretanja kartice gde se gubi prednji deo i ostaje samo zadnji */
+ .card:hover .front {
+	 transform: rotateY(180deg);
+
+/* Ovaj izraz omogucava da se sakrije zadnji deo kartice */
+ .card:nth-child(even):hover .front {
+	 transform: rotateY(-180deg);
+}
+
+/* ekstra fora ovaj deo sakriva tekst koji se nalazi sa zadnje starne kartice */
+
+ .back {
+	 background: #fff;
+	 transform: rotateY(-180deg);
+	 padding: 0 2em;
+}
+
+/* Bez ovog dela uopste se nevidi zadnjid deo kartice ???!!!  */
+ .card:hover .back {
+	 transform: rotateY(0deg);
+}
+/*  uopsšte ne znam čemu ovo služi*/
+ .card:nth-child(even) .back {
+	 transform: rotateY(180deg);
+}
+ .card:nth-child(even):hover .back {
+	 transform: rotateY(0deg);
+}
