@@ -125,6 +125,7 @@
 /* Stilizuje font kod krtak review filma */
 .review {
     font-style: italic;
+    margin-bottom: 20px;
 }
 /* Stilizuje font kod duži overview, opisa filma */
  p.overview {

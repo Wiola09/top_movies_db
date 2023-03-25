@@ -18,7 +18,7 @@ Bootstrap(app)
 
 ##CREATE DATABASE
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///new-movies-collection2.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///new-movies-collection4.db'
 # Optional: But it will silence the deprecation warning in the console.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # db = SQLAlchemy(app) # Ovaj deo je bio dok je class Nalozi(db.Model): bila definisna u ovom fajlu
@@ -89,10 +89,11 @@ def pretrazi_i_prikazi_filmove():
                 title=item["title"],
                 year=item['release_date'],
                 description=item['overview'],
-                rating="7.3",
+                rating=item['popularity'],
                 ranking=index + 1,
                 review=" ",
-                img_url=f"https://image.tmdb.org/t/p/w500{item['poster_path']}"
+                img_url=f"https://image.tmdb.org/t/p/w500{item['poster_path']}",
+                imdb_url=f""
 
             )
             lista.append(new_movie)
@@ -130,7 +131,8 @@ def dodaj_u_bazu():
         rating=film_rating,
         ranking="10",
         review=film_review,
-        img_url=f"https://image.tmdb.org/t/p/w500{film['poster_path']}"
+        img_url=f"https://image.tmdb.org/t/p/w500{film['poster_path']}",
+        imdb_url=f"https://www.imdb.com/title/{film['imdb_id']}/"
     )
     db.session.add(new_movie)
     db.session.commit()

@@ -40,6 +40,7 @@
                 <a href="{{ url_for('edit', film_id_za_dodati=film.imdb_id) }}" class="button">Add</a>
 
                 {% else %}
+                <p class="review"> <a href="{{film.imdb_url}}" >IMDB</a></p>
                 <a href="{{ url_for('edit', naslov=film.id) }}" class="button">Update</a>
                 <a href="{{ url_for('obrisi_film', rb=film.id) }}" class="button delete-button">Delete</a>
                 {% endif %}

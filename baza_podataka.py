@@ -17,10 +17,11 @@ class Movie(db.Model):
     title = db.Column(db.String(250), unique=True, nullable=True)
     year = db.Column(db.String(250), nullable=True)
     description = db.Column(db.String(250), nullable=True)
-    rating = db.Column(db.String(250), nullable=True)
+    rating = db.Column(db.Integer, nullable=True)
     ranking = db.Column(db.String(250), nullable=True)
     review = db.Column(db.String(250), nullable=True)
     img_url = db.Column(db.String(250), unique=True, nullable=True)
+    imdb_url = db.Column(db.String(250), unique=True, nullable=True)
 
 
     # Optional: this will allow each book object to be identified by its title when printed.
