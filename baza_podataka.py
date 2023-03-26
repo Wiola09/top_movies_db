@@ -58,8 +58,7 @@ class User(UserMixin, db.Model):
 class UserData:
     def __init__(self, email, password, name):
         self.email = email
-        self.password = self.password
-        # self.password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+        self.password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
         self.name = name
 
     def add_user(self):

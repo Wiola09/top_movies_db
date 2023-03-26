@@ -1,14 +1,16 @@
 import os
 
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, Length, Email
+from werkzeug.security import check_password_hash
+from flask_login import LoginManager, login_user, current_user, login_required
 
 from api_filmovi import TMDB_API
-from baza_podataka import db, Movie
+from baza_podataka import db, Movie, UserData, User
 
 APP_SECRET_KEY = os.getenv("APP_SECRET_KEY", "default_value")
 
@@ -24,7 +26,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # db = SQLAlchemy(app) # Ovaj deo je bio dok je class Nalozi(db.Model): bila definisna u ovom fajlu
 
 db.init_app(app)  # vidi komentar u baza_podataka
-##CREATE TABLE
+
+""" The login manager contains the code that lets your application and Flask-Login work together, such as how to load a user from an ID, where to send users when they need to log in, and the like.
+Once the actual application object has been created, you can configure it for login with:"""
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 # bez app_context() javlja gresku, mozda je do verzija Flask-SQLAlchemy==3.0.2
 with app.app_context():
@@ -60,6 +66,13 @@ recnik = {'adult': False,
           'video': False,
           'vote_average': 0.0,
           'vote_count': 0}
+
+
+""" The above code allows the app and login manager to work together. User_id allows to display unique data for 
+each user at a website (like account info, past purchases, carts, etc.)"""
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 @app.route("/add", methods=["GET", "POST"])
@@ -101,7 +114,7 @@ def pretrazi_i_prikazi_filmove():
         #
         # print(results)
         # print(film)
-        return render_template("index.html", filmovi=lista, prikazi_dugme=da_je_stranica_sa_rezultatima_pretrage)
+        return render_template("index.html", filmovi=lista, prikazi_dugme=da_je_stranica_sa_rezultatima_pretrage, logged_in=current_user.is_authenticated)
         return render_template("select.html", filmovi=lista)
 
     addmovie_form = AddMovie()
@@ -113,8 +126,9 @@ def obrisi_film():
     movie_to_delete = Movie.query.get(movie_id)
     db.session.delete(movie_to_delete)
     db.session.commit()
-    # Umesto return redirect(url_for('home')), sa url_for biramo funkciju
-    return redirect('/')
+    # Umesto return redirect(url_for('home_prikaz_filmova')), sa url_for biramo funkciju
+
+    return redirect('/home_prikaz_filmova')
 
 @app.route("/dodaj_u_bazu")
 def dodaj_u_bazu():
@@ -137,7 +151,10 @@ def dodaj_u_bazu():
     db.session.add(new_movie)
     db.session.commit()
 
-    return redirect("/")
+    return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
+    # Morao gornju liniju zbog prenosenja info o logovanju
+    return redirect("/", logged_in=current_user.is_authenticated)
+
 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
@@ -160,7 +177,7 @@ def edit():
             movie_to_update.review = film_review_forma
             movie_to_update.rating = film_rating_forma
             db.session.commit()
-            return redirect(url_for('home'))
+            return redirect(url_for('home_prikaz_filmova'))
         # Posto kada je nepostojeci film u nasoj DB javlja AttributeError to sam iskoristio
         # (mada nisam morao da specificiram gresku) i preusmerio nafunkciju za dodavanje
         # filma gde sam poslao potrebne argumente
@@ -177,8 +194,9 @@ def edit():
 
 
 
-@app.route("/")
-def home():
+@app.route("/home_prikaz_filmova")
+@login_required
+def home_prikaz_filmova():
     try:
         Movie.add_movie()
     except:
@@ -193,15 +211,60 @@ def home():
     # print(all_books)
     dodaj_novi = False
     db.session.commit()
-    return render_template("index.html", filmovi=svi_filmovi_sortirani)
+    return render_template("index.html", filmovi=svi_filmovi_sortirani, logged_in=current_user.is_authenticated)
+
+@app.route('/')
+def pocetak():
+    return render_template("pocetak.html")
+
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
-    pass
+    if request.method == "POST":
+        name = request.form.get('name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user_object = UserData.pretrazi_db_po_korisniku(UserData, vrednost_za_pretragu=email)
+
+        if user_object:
+            # metod flash je iz flaska, dodat kod i u *.html stranici
+            flash("You've already signed up with that email, log in instead!")
+            return redirect(url_for('register'))
+
+        UserData(
+            name=name,
+            email=email,
+            password=password,
+        ).add_user()
+        return redirect(url_for("home_prikaz_filmova", name=name))
+
+    return render_template("register.html")
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
-    pass
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user_object = UserData.pretrazi_db_po_korisniku(UserData, vrednost_za_pretragu=email)
+
+        if not user_object:
+            # metod flash je iz flaska, dodat kod i u *.html stranici
+            flash("That email does not exist, please try again.")
+            return redirect(url_for('login'))
+
+        # Password incorrect
+        # Check stored password hash against entered password hashed.
+        elif not check_password_hash(user_object.password, password):
+            # metod flash je iz flaska, dodat kod i u *.html stranici
+            flash('Password incorrect, please try again.')
+            return redirect(url_for('login'))
+
+        # Email exists and password correct
+        else:  # If the user has successfully logged in or registered, you need to use the login_user() function to authenticate them.
+            login_user(user_object)
+            return redirect(url_for('home_prikaz_filmova', name=user_object.name))
+
+    return render_template("login.html")
 
 @app.route('/logout')
 def logout():

@@ -1,7 +1,15 @@
  *, *:before, *:after {
 	 box-sizing: border-box;
 }
-
+.box {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -150px 0 0 -150px;
+	width:300px;
+	height:300px;
+}
+.box h1 { color: #fff; text-shadow: 0 0 10px rgba(0,0,0,0.3); letter-spacing:1px; text-align:center; }
  body {
 	 background-color: #ecf0f9;
 }
@@ -144,6 +152,8 @@
      font-size: 10rem;
   }
 /* klasa zaduzena za formatiranje flask forme, na stranici add*/
+/* tek sa dodavanjem klase .content i argumenta width: 100%;, uspeo sam da rastegnem polja na
+ maksimalnu sirinu na stranici register*/
  .content {
 	 display: flex;
 	 margin: 0 auto;
@@ -151,6 +161,7 @@
 	 align-items: center;
 	 flex-wrap: wrap;
 	 max-width: 1500px;
+	 width: 100%;
 }
 /* Deo vezan za dugme add na kraju index.html*/
 .container.add {
