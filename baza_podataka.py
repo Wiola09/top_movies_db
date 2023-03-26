@@ -7,9 +7,12 @@ as described in http://stackoverflow.com/a/9695045/2040487. –
 """
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 from datetime import datetime
+from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
+
 
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,3 +46,26 @@ class Movie(db.Model):
         )
         db.session.add(new_movie)
         db.session.commit()
+
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100))
+    name = db.Column(db.String(1000))
+
+
+class UserData:
+    def __init__(self, email, password, name):
+        self.email = email
+        self.password = self.password
+        # self.password = generate_password_hash(password, method='pbkdf2:sha256', salt_length=8)
+        self.name = name
+
+    def add_user(self):
+        new_user = User(email=self.email, password=self.password, name=self.name)
+        db.session.add(new_user)
+        db.session.commit()
+
+    def pretrazi_db_po_korisniku(self, vrednost_za_pretragu):
+        return User.query.filter_by(email=vrednost_za_pretragu).first()
