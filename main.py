@@ -195,6 +195,18 @@ def home():
     db.session.commit()
     return render_template("index.html", filmovi=svi_filmovi_sortirani)
 
+@app.route('/register', methods=["GET", "POST"])
+def register():
+    pass
+
+@app.route('/login', methods=["GET", "POST"])
+def login():
+    pass
+
+@app.route('/logout')
+def logout():
+    pass
+
 
 if __name__ == '__main__':
     app.run(debug=True, use_reloader=False)
