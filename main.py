@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, Length, Email
 from werkzeug.security import check_password_hash
-from flask_login import LoginManager, login_user, current_user, login_required
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 from api_filmovi import TMDB_API
 from baza_podataka import db, Movie, UserData, User
@@ -76,6 +76,7 @@ def load_user(user_id):
 
 
 @app.route("/add", methods=["GET", "POST"])
+@login_required
 def pretrazi_i_prikazi_filmove():
 
     """
@@ -121,6 +122,7 @@ def pretrazi_i_prikazi_filmove():
     return render_template("add.html", form=addmovie_form)
 
 @app.route("/delete", methods=["GET", "POST"])
+@login_required
 def obrisi_film():
     movie_id = request.args.get('rb')
     movie_to_delete = Movie.query.get(movie_id)
@@ -131,6 +133,7 @@ def obrisi_film():
     return redirect('/home_prikaz_filmova')
 
 @app.route("/dodaj_u_bazu")
+@login_required
 def dodaj_u_bazu():
     film_id = request.args.get('film_id_za_dodati')
     film_rating = request.args.get('film_rating')
@@ -157,6 +160,7 @@ def dodaj_u_bazu():
 
 
 @app.route("/edit", methods=["GET", "POST"])
+@login_required
 def edit():
     # Argumen se daje uz pozivanje funkcije u idex.html href="{{ url_for('edit', naslov=film.id) }}"
     movie_id = request.args.get('naslov')
@@ -268,7 +272,8 @@ def login():
 
 @app.route('/logout')
 def logout():
-    pass
+    logout_user()
+    return redirect(url_for('pocetak', logged_in=current_user.is_authenticated))
 
 
 if __name__ == '__main__':
