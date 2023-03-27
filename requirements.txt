@@ -11,4 +11,5 @@ Flask-WTF==1.0.1
 WTForms~=3.0.1
 requests~=2.28.2
 Flask-Login==0.6.2
+gunicorn==20.1.0
 # ImportError: cannot import name 'safe_str_cmp' from 'werkzeug.security' resena sa Flask-Login==0.6.2

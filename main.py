@@ -20,7 +20,8 @@ Bootstrap(app)
 
 ##CREATE DATABASE
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///new-movies-collection7.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///new-movies-collection.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL1", "sqlite:///new-movies-collection.db")
 # Optional: But it will silence the deprecation warning in the console.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # db = SQLAlchemy(app) # Ovaj deo je bio dok je class Nalozi(db.Model): bila definisna u ovom fajlu
