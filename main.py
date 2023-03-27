@@ -20,7 +20,7 @@ Bootstrap(app)
 
 ##CREATE DATABASE
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///new-movies-collection4.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///new-movies-collection7.db'
 # Optional: But it will silence the deprecation warning in the console.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # db = SQLAlchemy(app) # Ovaj deo je bio dok je class Nalozi(db.Model): bila definisna u ovom fajlu
@@ -107,7 +107,8 @@ def pretrazi_i_prikazi_filmove():
                 ranking=index + 1,
                 review=" ",
                 img_url=f"https://image.tmdb.org/t/p/w500{item['poster_path']}",
-                imdb_url=f""
+                imdb_url=f"",
+                email=current_user.email
 
             )
             lista.append(new_movie)
@@ -149,7 +150,8 @@ def dodaj_u_bazu():
         ranking="10",
         review=film_review,
         img_url=f"https://image.tmdb.org/t/p/w500{film['poster_path']}",
-        imdb_url=f"https://www.imdb.com/title/{film['imdb_id']}/"
+        imdb_url=f"https://www.imdb.com/title/{film['imdb_id']}/",
+        email=current_user.email
     )
     db.session.add(new_movie)
     db.session.commit()
@@ -206,16 +208,17 @@ def home_prikaz_filmova():
     except:
         print("vec dodat")
 
-    # Deo koda zaduzen za sortiranje filmova od manjeg ka vecem, pa se onda obrne,
-    svi_filmovi_sortirani = Movie.query.order_by(Movie.rating).all()
-    svi_filmovi_sortirani.reverse()
-    for i in range(len(svi_filmovi_sortirani)):
+        # Deo koda zaduzen za sortiranje filmova od manjeg ka vecem, pa se onda obrne,
+    svi_filmovi_po_logovanom_koriniku = Movie.query.filter(Movie.email == current_user.email).order_by(Movie.rating).all()
+
+    svi_filmovi_po_logovanom_koriniku.reverse()
+    for i in range(len(svi_filmovi_po_logovanom_koriniku)):
         # This line gives each movie a new ranking reversed from their order in all_movies
-        svi_filmovi_sortirani[i].ranking = i + 1
+        svi_filmovi_po_logovanom_koriniku[i].ranking = i + 1
     # print(all_books)
     dodaj_novi = False
     db.session.commit()
-    return render_template("index.html", filmovi=svi_filmovi_sortirani, logged_in=current_user.is_authenticated)
+    return render_template("index.html", filmovi=svi_filmovi_po_logovanom_koriniku, logged_in=current_user.is_authenticated)
 
 @app.route('/')
 def pocetak():
@@ -240,7 +243,15 @@ def register():
             email=email,
             password=password,
         ).add_user()
-        return redirect(url_for("home_prikaz_filmova", name=name))
+        user = User.query.filter_by(email=email).first()
+        """ Kada korisnik pošalje podatke za prijavu (npr. korisničko ime i lozinku), obično se ti podaci proveravaju u 
+        bazi podataka kako bi se utvrdilo da li su validni. Ako su podaci validni, korisnik se "autentikuje" 
+        (authenticate), što znači da se postavlja current_user objekat na instancu User klase koja predstavlja 
+        prijavljenog korisnika.U Flasku se ovo obično radi pomoću login_user() funkcije, koja prima User objekat kao 
+        argument i postavlja current_user na taj objekat."""
+        login_user(user)
+
+        return redirect(url_for("home_prikaz_filmova", name=name, logged_in=current_user.is_authenticated))
 
     return render_template("register.html")
 
@@ -264,7 +275,8 @@ def login():
             return redirect(url_for('login'))
 
         # Email exists and password correct
-        else:  # If the user has successfully logged in or registered, you need to use the login_user() function to authenticate them.
+        else:  # If the user has successfully logged in or registered, you need to use the login_user() function to
+               # authenticate them.
             login_user(user_object)
             return redirect(url_for('home_prikaz_filmova', name=user_object.name))
 

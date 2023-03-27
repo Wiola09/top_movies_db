@@ -25,6 +25,7 @@ class Movie(db.Model):
     review = db.Column(db.String(250), nullable=True)
     img_url = db.Column(db.String(250), unique=True, nullable=True)
     imdb_url = db.Column(db.String(250), unique=True, nullable=True)
+    email = db.Column(db.String(100), nullable=True)
 
 
     # Optional: this will allow each book object to be identified by its title when printed.
@@ -42,7 +43,8 @@ class Movie(db.Model):
             ranking="10",
             review="My favourite character was the caller.",
             # img_url="https://image.tmdb.org/t/p/w500/tjrX2oWRCM3Tvarz38zlZM7Uc10.jpg"
-            img_url = "https://m.media-amazon.com/images/M/MV5BZjY5ZjQyMjMtMmEwOC00Nzc2LTllYTItMmU2MzJjNTg1NjY0XkEyXkFqcGdeQXVyNjQ1MTMzMDQ@._V1_.jpg"
+            img_url = "https://m.media-amazon.com/images/M/MV5BZjY5ZjQyMjMtMmEwOC00Nzc2LTllYTItMmU2MzJjNTg1NjY0XkEyXkFqcGdeQXVyNjQ1MTMzMDQ@._V1_.jpg",
+
         )
         db.session.add(new_movie)
         db.session.commit()
