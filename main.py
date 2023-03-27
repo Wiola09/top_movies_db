@@ -139,14 +139,23 @@ def obrisi_film():
 def dodaj_u_bazu():
     film_id = request.args.get('film_id_za_dodati')
     film_rating = request.args.get('film_rating')
+    print(len(film_rating))
     film_review = request.args.get('film_review')
+    print(len(film_review))
     tmdb = TMDB_API()
     film = tmdb.uzmi_film_API(film_id)
+    print(len(film["original_title"]), len(film["release_date"]), len(film["overview"]), len(f"https://image.tmdb.org/t/p/w500{film['poster_path']}"), len(f"https://www.imdb.com/title/{film['imdb_id']}/"))
+    opis = film["overview"]
+    if len(opis) > 249:
+        opis2 =film["overview"][249]
+    else:
+        opis2 = opis
+
     new_movie = Movie(
         imdb_id=film["id"],
         title=film["original_title"],
         year=film["release_date"],
-        description=film["overview"],
+        description=opis2,
         rating=film_rating,
         ranking="10",
         review=film_review,
