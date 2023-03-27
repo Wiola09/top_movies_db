@@ -16,15 +16,15 @@ db = SQLAlchemy()
 
 class Movie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    imdb_id = db.Column(db.String(250), unique=True, nullable=True)
-    title = db.Column(db.String(250), unique=True, nullable=True)
+    imdb_id = db.Column(db.String(250), nullable=True)
+    title = db.Column(db.String(250), nullable=True)
     year = db.Column(db.String(250), nullable=True)
     description = db.Column(db.String(250), nullable=True)
     rating = db.Column(db.Integer, nullable=True)
     ranking = db.Column(db.String(250), nullable=True)
     review = db.Column(db.String(250), nullable=True)
-    img_url = db.Column(db.String(250), unique=True, nullable=True)
-    imdb_url = db.Column(db.String(250), unique=True, nullable=True)
+    img_url = db.Column(db.String(250), nullable=True)
+    imdb_url = db.Column(db.String(250), nullable=True)
     email = db.Column(db.String(100), nullable=True)
 
 

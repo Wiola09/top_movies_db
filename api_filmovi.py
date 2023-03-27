@@ -42,6 +42,7 @@ class TMDB_API:
         # print(json_data_film["poster_path"])
         # print(json_data_film["release_date"])
         # print(json_data_film["overview"])
+        print("uzet pojedinačan film")
         return json_data_film
         """response.text  je  {"adult":false,
                   "backdrop_path":"/ykl4EIbQIddiBYTrq5hghgDL9Ky.jpg",
