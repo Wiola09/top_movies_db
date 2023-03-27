@@ -151,6 +151,7 @@ def dodaj_u_bazu():
     else:
         opis2 = opis
 
+
     new_movie = Movie(
         imdb_id=film["id"],
         title=film["original_title"],
