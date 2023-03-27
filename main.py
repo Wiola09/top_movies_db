@@ -165,6 +165,7 @@ def dodaj_u_bazu():
     except:
         db.session.rollback()
         db.session.commit()
+        dal_postoji_u_bazi_korisnika = None
 
           # dal_postoji_u_bazi_korisnika = ""
         # print(len(dal_postoji_u_bazi_korisnika))
