@@ -1,6 +1,10 @@
  *, *:before, *:after {
 	 box-sizing: border-box;
 }
+.flash {
+text-align: center;
+color: red;
+}
 .box {
 	position: absolute;
 	top: 50%;

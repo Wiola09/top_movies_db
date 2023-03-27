@@ -229,7 +229,7 @@ def register():
         if user_object:
             # metod flash je iz flaska, dodat kod i u *.html stranici
             flash("You've already signed up with that email, log in instead!")
-            return redirect(url_for('register'))
+            return redirect(url_for('login'))
 
         UserData(
             name=name,
@@ -249,8 +249,8 @@ def login():
 
         if not user_object:
             # metod flash je iz flaska, dodat kod i u *.html stranici
-            flash("That email does not exist, please try again.")
-            return redirect(url_for('login'))
+            flash("That email does not exist, please register.")
+            return redirect(url_for('register'))
 
         # Password incorrect
         # Check stored password hash against entered password hashed.
