@@ -150,8 +150,13 @@ def dodaj_u_bazu():
         opis2 =film["overview"][:249]
     else:
         opis2 = opis
-
-    dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).all()
+    print(type(Movie2.imdb_id))
+    print(Movie2.imdb_id)
+    print(type(film["id"]))
+    try:
+        dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).all()
+    except:
+        dal_postoji_u_bazi_korisnika = 0
     if len(dal_postoji_u_bazi_korisnika) > 0:
         print(dal_postoji_u_bazi_korisnika, "vec postoji u bazi")
         return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
