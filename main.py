@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 
 from api_filmovi import TMDB_API
-from baza_podataka import db, Movie, UserData, User
+from baza_podataka import db, Movie2, UserData, User_movie
 
 APP_SECRET_KEY = os.getenv("APP_SECRET_KEY", "default_value")
 
@@ -73,7 +73,7 @@ recnik = {'adult': False,
 each user at a website (like account info, past purchases, carts, etc.)"""
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return User_movie.query.get(int(user_id))
 
 
 @app.route("/add", methods=["GET", "POST"])
@@ -99,7 +99,7 @@ def pretrazi_i_prikazi_filmove():
         results = tmdb.uzmi_API(film)
         lista = []
         for index, item in enumerate(results):
-            new_movie = Movie(
+            new_movie = Movie2(
                 imdb_id=item["id"],
                 title=item["title"],
                 year=item['release_date'],
@@ -127,7 +127,7 @@ def pretrazi_i_prikazi_filmove():
 @login_required
 def obrisi_film():
     movie_id = request.args.get('rb')
-    movie_to_delete = Movie.query.get(movie_id)
+    movie_to_delete = Movie2.query.get(movie_id)
     db.session.delete(movie_to_delete)
     db.session.commit()
     # Umesto return redirect(url_for('home_prikaz_filmova')), sa url_for biramo funkciju
@@ -152,7 +152,7 @@ def dodaj_u_bazu():
         opis2 = opis
 
 
-    new_movie = Movie(
+    new_movie = Movie2(
         imdb_id=film["id"],
         title=film["original_title"],
         year=film["release_date"],
@@ -183,7 +183,7 @@ def edit():
     film_test = request.args.get("film_id_za_dodati")
     print(film_test)
 
-    movie_to_update = Movie.query.filter_by(id=movie_id).first()
+    movie_to_update = Movie2.query.filter_by(id=movie_id).first()
     print(movie_to_update)
     # ovde mislim da moze i if edit_review_and_rating_form.validate_on_submit():,
     # mozda samo treba pre definisati formu edit_review_and_rating_form = RateMovieForm())
@@ -217,12 +217,12 @@ def edit():
 @login_required
 def home_prikaz_filmova():
     try:
-        Movie.add_movie()
+        Movie2.add_movie()
     except:
         print("vec dodat")
 
         # Deo koda zaduzen za sortiranje filmova od manjeg ka vecem, pa se onda obrne,
-    svi_filmovi_po_logovanom_koriniku = Movie.query.filter(Movie.email == current_user.email).order_by(Movie.rating).all()
+    svi_filmovi_po_logovanom_koriniku = Movie2.query.filter(Movie2.email == current_user.email).order_by(Movie2.rating).all()
 
     svi_filmovi_po_logovanom_koriniku.reverse()
     for i in range(len(svi_filmovi_po_logovanom_koriniku)):
@@ -256,7 +256,7 @@ def register():
             email=email,
             password=password,
         ).add_user()
-        user = User.query.filter_by(email=email).first()
+        user = User_movie.query.filter_by(email=email).first()
         """ Kada korisnik pošalje podatke za prijavu (npr. korisničko ime i lozinku), obično se ti podaci proveravaju u 
         bazi podataka kako bi se utvrdilo da li su validni. Ako su podaci validni, korisnik se "autentikuje" 
         (authenticate), što znači da se postavlja current_user objekat na instancu User klase koja predstavlja 

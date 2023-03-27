@@ -14,7 +14,7 @@ from werkzeug.security import generate_password_hash
 db = SQLAlchemy()
 
 
-class Movie(db.Model):
+class Movie2(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     imdb_id = db.Column(db.String(250), nullable=True)
     title = db.Column(db.String(260), nullable=True)
@@ -33,7 +33,7 @@ class Movie(db.Model):
         return f'<Books {self.title}>'
 
     def add_movie(self):
-        new_movie = Movie(
+        new_movie = Movie2(
             id=2,
             imdb_id="55",
             title="Phone Boothaa",
@@ -50,7 +50,7 @@ class Movie(db.Model):
         db.session.commit()
 
 
-class User(UserMixin, db.Model):
+class User_movie(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
@@ -64,9 +64,9 @@ class UserData:
         self.name = name
 
     def add_user(self):
-        new_user = User(email=self.email, password=self.password, name=self.name)
+        new_user = User_movie(email=self.email, password=self.password, name=self.name)
         db.session.add(new_user)
         db.session.commit()
 
     def pretrazi_db_po_korisniku(self, vrednost_za_pretragu):
-        return User.query.filter_by(email=vrednost_za_pretragu).first()
+        return User_movie.query.filter_by(email=vrednost_za_pretragu).first()
