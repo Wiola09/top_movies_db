@@ -167,6 +167,7 @@ def dodaj_u_bazu():
     db.session.add(new_movie)
     db.session.commit()
 
+
     return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
     # Morao gornju liniju zbog prenosenja info o logovanju
     return redirect("/", logged_in=current_user.is_authenticated)
