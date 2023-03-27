@@ -153,12 +153,17 @@ def dodaj_u_bazu():
     print(type(Movie2.imdb_id))
     print(Movie2.imdb_id)
     print(type(film["id"]))
+    """ Ako vam linija koda 
+    Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).all()
+     pravi problem kada nema rezultata pretrage, možete dodati provjeru da li postoji bilo koji red u odgovoru pozivom
+      metode first() umjesto all(). Na taj način, ako nema odgovarajućih redova, varijabla će biti None."""
+
     try:
-        dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).all()
+        dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).first()
     except:
         dal_postoji_u_bazi_korisnika = ""
         print(len(dal_postoji_u_bazi_korisnika))
-    if len(dal_postoji_u_bazi_korisnika) > 0:
+    if dal_postoji_u_bazi_korisnika:
         print(dal_postoji_u_bazi_korisnika, "vec postoji u bazi")
         return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
 
