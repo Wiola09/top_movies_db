@@ -147,10 +147,14 @@ def dodaj_u_bazu():
     print(len(film["original_title"]), len(film["release_date"]), len(film["overview"]), len(f"https://image.tmdb.org/t/p/w500{film['poster_path']}"), len(f"https://www.imdb.com/title/{film['imdb_id']}/"))
     opis = film["overview"]
     if len(opis) > 249:
-        opis2 =film["overview"][249]
+        opis2 =film["overview"][:249]
     else:
         opis2 = opis
 
+    dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).all()
+    if len(dal_postoji_u_bazi_korisnika) > 0:
+        print(dal_postoji_u_bazi_korisnika, "vec postoji u bazi")
+        return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
 
     new_movie = Movie2(
         imdb_id=film["id"],
@@ -167,8 +171,6 @@ def dodaj_u_bazu():
     db.session.add(new_movie)
     db.session.commit()
 
-
-
     return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
     # Morao gornju liniju zbog prenosenja info o logovanju
     return redirect("/", logged_in=current_user.is_authenticated)
@@ -179,12 +181,20 @@ def dodaj_u_bazu():
 def edit():
     # Argumen se daje uz pozivanje funkcije u idex.html href="{{ url_for('edit', naslov=film.id) }}"
     movie_id = request.args.get('naslov')
-    print(movie_id)
     film_test = request.args.get("film_id_za_dodati")
-    print(film_test)
+
+    # if petlja zaduzena za proveru da li film vec postoji u bazi, ako postoji uzima njegov id dodeljuje movie_id,
+    # i dalje se nastavlja sa editovanje rewiev i rating kao da je pritisnuto dugme update
+    if film_test:
+        dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email,
+                                                           Movie2.imdb_id == film_test).order_by(Movie2.rating).all()
+        if len(dal_postoji_u_bazi_korisnika) > 0:
+            # iz nekog razloga mi generise dve poruke, pa sam u index.html morao da biram prvu poruku iz liste
+            flash(f"The movie {dal_postoji_u_bazi_korisnika[0].title} already exists in the database!")
+            movie_id = dal_postoji_u_bazi_korisnika[0].id
+            # return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
 
     movie_to_update = Movie2.query.filter_by(id=movie_id).first()
-    print(movie_to_update)
     # ovde mislim da moze i if edit_review_and_rating_form.validate_on_submit():,
     # mozda samo treba pre definisati formu edit_review_and_rating_form = RateMovieForm())
 
@@ -231,7 +241,13 @@ def home_prikaz_filmova():
     # print(all_books)
     dodaj_novi = False
     db.session.commit()
-    return render_template("index.html", filmovi=svi_filmovi_po_logovanom_koriniku, logged_in=current_user.is_authenticated)
+    print(current_user.name)
+    return render_template(
+        "index.html",
+        filmovi=svi_filmovi_po_logovanom_koriniku,
+        logged_in=current_user.is_authenticated,
+        name=current_user.name
+        )
 
 @app.route('/')
 def pocetak():

@@ -15,8 +15,14 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="heading ">My Top 10 Movies</h1>
+
+    <h1 class="heading ">{{name}} Top 10 Movies</h1>
     <p class="description">These are my all time favourite movies.</p>
+    {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                 <p class="flash">{{ messages[0] }}</p>
+            {% endif %}
+        {% endwith %}
 
     {% for film in filmovi %}
 
