@@ -156,7 +156,8 @@ def dodaj_u_bazu():
     try:
         dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).all()
     except:
-        dal_postoji_u_bazi_korisnika = 0
+        dal_postoji_u_bazi_korisnika = ""
+        print(len(dal_postoji_u_bazi_korisnika))
     if len(dal_postoji_u_bazi_korisnika) > 0:
         print(dal_postoji_u_bazi_korisnika, "vec postoji u bazi")
         return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
