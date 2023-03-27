@@ -8,6 +8,8 @@ from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import DataRequired, Length, Email
 from werkzeug.security import check_password_hash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
+# from flask_sqlalchemy.exc import DBAPIError
+from psycopg2.extensions import TransactionRollbackError
 
 from api_filmovi import TMDB_API
 from baza_podataka import db, Movie2, UserData, User_movie
@@ -161,8 +163,11 @@ def dodaj_u_bazu():
     try:
         dal_postoji_u_bazi_korisnika = Movie2.query.filter(Movie2.email == current_user.email, Movie2.imdb_id == film["id"]).order_by(Movie2.rating).first()
     except:
-        dal_postoji_u_bazi_korisnika = ""
-        print(len(dal_postoji_u_bazi_korisnika))
+        db.session.rollback()
+        db.session.commit()
+
+          # dal_postoji_u_bazi_korisnika = ""
+        # print(len(dal_postoji_u_bazi_korisnika))
     if dal_postoji_u_bazi_korisnika:
         print(dal_postoji_u_bazi_korisnika, "vec postoji u bazi")
         return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
