@@ -61,6 +61,19 @@ color: red;
 	 margin: 1rem auto;
 	 position: relative;
 }
+@media (max-width: 768px) {
+   .card {
+      width: calc(90% - 2rem);
+      min-width: calc(90% - 2rem);
+   }
+}
+
+@media (max-width: 576px) {
+   .card {
+      width: 80%;
+      min-width: 80%;
+   }
+}
 
  .front, .back {
 	 display: flex;
