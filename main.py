@@ -115,6 +115,8 @@ def pretrazi_i_prikazi_filmove():
 
             )
             lista.append(new_movie)
+        if len(lista) == 0:
+            flash("There are no results in the database for the entered value, repeat the search with a new value !")
         # print(len(lista))
         #
         # print(results)
