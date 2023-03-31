@@ -30,7 +30,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)  # vidi komentar u baza_podataka
 
-""" The login manager contains the code that lets your application and Flask-Login work together, such as how to load a user from an ID, where to send users when they need to log in, and the like.
+""" The login manager contains the code that lets your application and Flask-Login work together, such as how to load a 
+user from an ID, where to send users when they need to log in, and the like.
 Once the actual application object has been created, you can configure it for login with:"""
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -71,7 +72,7 @@ recnik = {'adult': False,
           'vote_count': 0}
 
 
-""" The above code allows the app and login manager to work together. User_id allows to display unique data for 
+""" The below code allows the app and login manager to work together. User_id allows to display unique data for 
 each user at a website (like account info, past purchases, carts, etc.)"""
 @login_manager.user_loader
 def load_user(user_id):
