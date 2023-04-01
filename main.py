@@ -50,7 +50,7 @@ class RateMovieForm(FlaskForm):
     # rating = IntegerField(label='Your Rating Out of 10 e.g. 8', default=7, validators=[NumberRange(min=0, max=10, message="Morate uneti pozitivan broj")])
 
     rating = IntegerField(label='Your Rating Out of 10 e.g. 8', default=7, validators=[NumberRange(min=0, max=10)])
-    review = StringField(label='Your Review', default="Good movie", validators=[Length(min=8)])
+    review = StringField(label='Your Review', default="Good movie", validators=[Length(min=8, max=250)])
     submit = SubmitField(label="Done")
 
 
