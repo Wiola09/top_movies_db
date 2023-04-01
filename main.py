@@ -4,8 +4,8 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import DataRequired, Length, Email
+from wtforms import StringField, SubmitField, PasswordField, IntegerField
+from wtforms.validators import DataRequired, Length, Email, NumberRange
 from werkzeug.security import check_password_hash
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 # from flask_sqlalchemy.exc import DBAPIError
@@ -46,13 +46,17 @@ with app.app_context():
 
 
 class RateMovieForm(FlaskForm):
-    rating = StringField(label='Your Rating Out of 10 e.g. 7.5', validators=[Length(min=8)])
-    review = StringField(label='Your Review', validators=[Length(min=8)])
+    # Primer koda sa svojom porukom o gresci
+    # rating = IntegerField(label='Your Rating Out of 10 e.g. 8', default=7, validators=[NumberRange(min=0, max=10, message="Morate uneti pozitivan broj")])
+
+    rating = IntegerField(label='Your Rating Out of 10 e.g. 8', default=7, validators=[NumberRange(min=0, max=10)])
+    review = StringField(label='Your Review', default="Good movie", validators=[Length(min=8)])
     submit = SubmitField(label="Done")
 
 
 class AddMovie(FlaskForm):
-    title = StringField(label='Movie Title', validators=[Length(min=8)])
+    # iako je ovde dodat, ali ne koristim validator
+    title = StringField(label='Movie Title', default="Enter Movie Title", validators=[Length(min=8)])
     submit = SubmitField(label="Search By Name")
 
 
@@ -215,28 +219,40 @@ def edit():
             # return redirect(url_for("home_prikaz_filmova", logged_in=current_user.is_authenticated))
 
     movie_to_update = Movie2.query.filter_by(id=movie_id).first()
+
+    edit_review_and_rating_form = RateMovieForm()
     # ovde mislim da moze i if edit_review_and_rating_form.validate_on_submit():,
     # mozda samo treba pre definisati formu edit_review_and_rating_form = RateMovieForm())
-
     if request.method == "POST":
-        film_review_forma = request.form["review"]
-        film_rating_forma = request.form["rating"]
-        try:
-            # Prvo probava pretragu baze, ovo hvata posle pritiska "update" dugmeta, editovanje psotojeceg filma
-            movie_to_update.review = film_review_forma
-            movie_to_update.rating = film_rating_forma
-            db.session.commit()
-            return redirect(url_for('home_prikaz_filmova'))
-        # Posto kada je nepostojeci film u nasoj DB javlja AttributeError to sam iskoristio
-        # (mada nisam morao da specificiram gresku) i preusmerio nafunkciju za dodavanje
-        # filma gde sam poslao potrebne argumente
-        except AttributeError:
-            return redirect(url_for("dodaj_u_bazu",
-                                    film_id_za_dodati=film_test,
-                                    film_rating=film_rating_forma,
-                                    film_review=film_review_forma
-                                    ))
-    edit_review_and_rating_form = RateMovieForm()
+        # Ovde validacije forme radi svoj posao
+        if edit_review_and_rating_form.validate():
+            film_rating_forma = edit_review_and_rating_form.rating.data
+            film_review_forma = edit_review_and_rating_form.review.data
+
+            # # Može i ovako :
+            # film_review_forma = request.form["review"]
+            # film_rating_forma = request.form["rating"]
+            try:
+                # Prvo probava pretragu baze, ovo hvata posle pritiska "update" dugmeta, editovanje psotojeceg filma
+                movie_to_update.review = film_review_forma
+                movie_to_update.rating = film_rating_forma
+                db.session.commit()
+                return redirect(url_for('home_prikaz_filmova'))
+            # Posto kada je nepostojeci film u nasoj DB javlja AttributeError to sam iskoristio
+            # (mada nisam morao da specificiram gresku) i preusmerio nafunkciju za dodavanje
+            # filma gde sam poslao potrebne argumente
+            except AttributeError:
+                return redirect(url_for("dodaj_u_bazu",
+                                        film_id_za_dodati=film_test,
+                                        film_rating=film_rating_forma,
+                                        film_review=film_review_forma
+                                        ))
+
+        else:
+            errors = edit_review_and_rating_form.errors
+            print(errors)
+            # prikaži greške nekako na stranici
+            return render_template("edit.html", form=edit_review_and_rating_form, id=movie_to_update)
 
     # ovaj id mi sluzi da prenesem objekat filma <h1 class="heading">{{ id.title }}</h1>
     return render_template("edit.html", form=edit_review_and_rating_form, id=movie_to_update)
