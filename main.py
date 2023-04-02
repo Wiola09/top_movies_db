@@ -130,7 +130,7 @@ def pretrazi_i_prikazi_filmove():
         return render_template("select.html", filmovi=lista)
 
     addmovie_form = AddMovie()
-    return render_template("add.html", form=addmovie_form)
+    return render_template("add.html", form=addmovie_form, logged_in=current_user.is_authenticated)
 
 @app.route("/delete", methods=["GET", "POST"])
 @login_required
@@ -255,7 +255,7 @@ def edit():
             return render_template("edit.html", form=edit_review_and_rating_form, id=movie_to_update)
 
     # ovaj id mi sluzi da prenesem objekat filma <h1 class="heading">{{ id.title }}</h1>
-    return render_template("edit.html", form=edit_review_and_rating_form, id=movie_to_update)
+    return render_template("edit.html", form=edit_review_and_rating_form, id=movie_to_update, logged_in=current_user.is_authenticated)
 
 
 
