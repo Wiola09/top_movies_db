@@ -82,6 +82,14 @@ each user at a website (like account info, past purchases, carts, etc.)"""
 def load_user(user_id):
     return User_movie.query.get(int(user_id))
 
+@app.route('/favicon.ico')
+def favicon():
+    """
+    Morao sam dodati ovu funkciju jer izgleda da mi base.html nije bio u kontekstu, pa url_for nije radio,
+     problem je nastao kada sam dodao footer.html i ejdnostavno favicon nije mogao da bude nađen
+    :return: file favicon.ico
+    """
+    return redirect(url_for('static', filename='images/favicon.ico'))
 
 @app.route("/add", methods=["GET", "POST"])
 @login_required
@@ -287,6 +295,8 @@ def home_prikaz_filmova():
 
 @app.route('/')
 def pocetak():
+    ip_address = request.remote_addr
+    print(f'Tvoja IP adresa je: {ip_address}')
     return render_template("pocetak.html")
 
 
