@@ -297,6 +297,9 @@ def home_prikaz_filmova():
 def pocetak():
     ip_address = request.remote_addr
     print(f'Tvoja IP adresa je: {ip_address}')
+    ip_address2 = request.headers.get('X-Forwarded-For', request.remote_addr)
+    print(f'Tvoja IP adresa2 je: {ip_address2}')
+    print(request.headers)
     return render_template("pocetak.html")
 
 
